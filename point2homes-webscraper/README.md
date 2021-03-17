@@ -17,6 +17,6 @@ If `ENV` is `DEV`, prints house information to terminal, if `ENV` is `PROD` inse
 
 Copy `.env.stub` to `.env` file and configure environment variables
 
-## How to Run
+## How to Run Locally
 
-run `python app.py`
+run `python-lambda-local -f handler -e .env handler.py event.jso`
