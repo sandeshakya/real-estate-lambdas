@@ -19,4 +19,4 @@ Copy `.env.stub` to `.env` file and configure environment variables
 
 ## How to Run Locally
 
-run `python-lambda-local -f handler -e .env handler.py event.json`
+run `python-lambda-local -f handler -e .env src/handler.py event/event.json -t 300`
