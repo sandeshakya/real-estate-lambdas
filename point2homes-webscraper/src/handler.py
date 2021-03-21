@@ -28,6 +28,7 @@ def insertToTable(item: dict) -> int:
                 "price": item['price'],
                 "lat": Decimal(str(item['lat'])),
                 "long": Decimal(str(item['long'])),
+                "type":'POINT2HOMES'
             },
             ConditionExpression=Attr("id").not_exists(),
         )
