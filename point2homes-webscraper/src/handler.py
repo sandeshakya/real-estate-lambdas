@@ -11,7 +11,6 @@ from mypy_boto3_dynamodb import DynamoDBServiceResource
 dynamodb: DynamoDBServiceResource = boto3.resource("dynamodb")
 table = dynamodb.Table(os.environ.get("TABLE_NAME"))
 
-
 def insertToTable(item: dict) -> int:
     """
     Inserts item dynamodb Table
@@ -20,11 +19,11 @@ def insertToTable(item: dict) -> int:
         table.put_item(
             Item={
                 "id": item['id'],
-                "title": item['title'],
+                "address": item['address'],
                 "link": item['link'],
                 "beds": item['beds'],
                 "baths": Decimal(str(item['baths'])),
-                "sqft": item['sqft'],
+                "area": item['area'],
                 "price": item['price'],
                 "lat": Decimal(str(item['lat'])),
                 "long": Decimal(str(item['long'])),
@@ -54,7 +53,7 @@ def handler(event, context):
         items = soup.find_all("div", {"class": "item-right-cnt"})
 
         for item in items:
-            title = (
+            address = (
                 item.find("div", {"class": "address-container"}).text.strip()
                 if item.find("div", {"class": "address-container"}) is not None
                 else None
@@ -67,7 +66,7 @@ def handler(event, context):
                 if item.find("li", {"class": "ic-baths"}) is not None
                 else None
             )
-            sqft = (lambda x: int(x.replace(",", "")))(
+            area = (lambda x: int(x.replace(",", "")))(
                 item.find("li", {"class": "ic-sqft"}).find("strong").text
             )
             price = (
@@ -82,11 +81,11 @@ def handler(event, context):
             listings.append(
                 dict(
                     id=id,
-                    title=title,
+                    address=address,
                     link=link,
                     beds=beds,
                     baths=baths,
-                    sqft=sqft,
+                    area=area,
                     price=price,
                     lat=lat,
                     long=long,

@@ -2,7 +2,35 @@ import logging
 import os
 import requests
 from bs4 import BeautifulSoup
+from decimal import Decimal
+import boto3
+from boto3.dynamodb.conditions import Attr
+from mypy_boto3_dynamodb import DynamoDBServiceResource
 
+dynamodb: DynamoDBServiceResource = boto3.resource("dynamodb")
+table = dynamodb.Table(os.environ.get("TABLE_NAME"))
+
+def insertToTable(item: dict) -> int:
+    """
+    Inserts item dynamodb Table
+    """
+    try:
+        table.put_item(
+            Item={
+                "id": item['id'],
+                "address": item['address'],
+                "link": item['link'],
+                "beds": item['beds'],
+                "baths": Decimal(str(item['baths'])),
+                "area": item['area'],
+                "price": item['price'],
+                "type":item['type']
+            },
+            ConditionExpression=Attr("id").not_exists(),
+        )
+        return 1
+    except Exception as e:
+        return 0
 
 def handler(event, context):
     base_url = "https://saskhouses.com"
@@ -39,42 +67,14 @@ def handler(event, context):
                 page = BeautifulSoup(
                     requests.get(url=link, headers=header).text, "html.parser"
                 )
-                overview = page.find("div", {"class": "d-flex property-overview-data"})
-                id = (
-                    page.find("div", "detail-wrap")
-                    .find(text="Property ID:")
-                    .findNext()
-                    .text
-                )
-                beds = (
-                    overview.find("li", {"class": "h-beds"})
-                    .findPrevious("li")
-                    .text.strip()
-                    if overview.find("li", {"class": "h-beds"}) is not None
-                    else None
-                )
-                baths = (
-                    overview.find("li", {"class": "h-baths"})
-                    .findPrevious("li")
-                    .text.strip()
-                    if overview.find("li", {"class": "h-baths"}) is not None
-                    else None
-                )
-                area = (
-                    overview.find("li", {"class": "h-area"})
-                    .findPrevious("li")
-                    .text.strip()
-                    if overview.find("li", {"class": "h-area"}) is not None
-                    else None
-                )
-                year = (
-                    overview.find("li", {"class": "h-year-built"})
-                    .findPrevious("li")
-                    .text.strip()
-                    if overview.find("li", {"class": "h-year-built"}) is not None
-                    else None
-                )
-                address = page.find("li", {"class": "detail-address"}).text
+                address= page.find('li',{'class':'detail-address'}).text
+                details = page.find('div','detail-wrap')
+                id = details.find(text='Property ID:').findNext().text.strip() if details.find(text='Property ID:') is not None else None
+                price = details.find(text='Price:').findNext().text.strip() if details.find(text='Price:') is not None else None
+                area = details.find(text='Property Size:').findNext().text.strip() if details.find(text='Property Size:') is not None else None
+                beds = details.find(text='Bedrooms:').findNext().text.strip() if details.find(text='Bedrooms:') is not None else None
+                baths = details.find(text='Bathrooms:').findNext().text.strip() if details.find(text='Bathrooms:') is not None else None
+                year = details.find(text='Year Built:').findNext().text.strip() if details.find(text='Year Built:') is not None else None
 
                 listings.append(
                     dict(
@@ -84,9 +84,12 @@ def handler(event, context):
                         beds=beds,
                         baths=baths,
                         area=area,
+                        price = price,
                         year=year,
                         type="SASKHOUSES",
                     )
                 )
     logging.info("found {} listings".format(len(listings)))
+    logging.info("adding listings to table...")
+    logging.info("{} listings added to table".format(sum([insertToTable(listing) for listing in listings])))
     return dict(status=200)
