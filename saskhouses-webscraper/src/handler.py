@@ -1,5 +1,6 @@
 import logging
 import os
+import json
 import requests
 from bs4 import BeautifulSoup
 from decimal import Decimal
@@ -10,6 +11,7 @@ import time
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(os.environ.get("TABLE_NAME"))
 logging.getLogger().setLevel(logging.INFO)
+
 
 def insertToTable(item: dict) -> int:
     """
@@ -36,6 +38,7 @@ def insertToTable(item: dict) -> int:
 
 
 def handler(event, context):
+    print(json.dumps(event))
     base_url = "https://saskhouses.com"
     search_url = base_url + "/search-results-2"
     header = {
@@ -55,7 +58,7 @@ def handler(event, context):
                 "status[]": "for-sale",
                 "bedrooms": str(bed),
                 "bathrooms": str(bath),
-                "min-price":event['minPrice'],
+                "min-price": event['minPrice'],
                 "max-price": event['maxPrice'],
             }
 
@@ -116,7 +119,8 @@ def handler(event, context):
                         else None,
                         price=(
                             lambda x: int(
-                                x.replace("$", "").replace("CAD", "").replace(",", "")
+                                x.replace("$", "").replace(
+                                    "CAD", "").replace(",", "")
                             )
                         )(price),
                         year=year,
