@@ -1,14 +1,13 @@
 from decimal import Decimal
-import json
 import os
 import logging
 import requests
 from bs4 import BeautifulSoup
 import boto3
 from boto3.dynamodb.conditions import Attr
-from mypy_boto3_dynamodb import DynamoDBServiceResource
+import time
 
-dynamodb: DynamoDBServiceResource = boto3.resource("dynamodb")
+dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(os.environ.get("TABLE_NAME"))
 
 def insertToTable(item: dict) -> int:
@@ -19,6 +18,8 @@ def insertToTable(item: dict) -> int:
         table.put_item(
             Item={
                 "id": item['id'],
+                "type":'POINT2HOMES',
+                'createdat':Decimal(str(round(time.time()*1000))),
                 "address": item['address'],
                 "link": item['link'],
                 "beds": item['beds'],
@@ -27,12 +28,13 @@ def insertToTable(item: dict) -> int:
                 "price": item['price'],
                 "lat": Decimal(str(item['lat'])),
                 "long": Decimal(str(item['long'])),
-                "type":'POINT2HOMES'
+                
             },
             ConditionExpression=Attr("id").not_exists(),
         )
         return 1
     except Exception as e:
+        print(e)
         return 0
 
 
@@ -80,7 +82,7 @@ def handler(event, context):
             )
             listings.append(
                 dict(
-                    id=id,
+                    id = id,
                     address=address,
                     link=link,
                     beds=beds,
@@ -102,4 +104,5 @@ def handler(event, context):
             sum([insertToTable(listing) for listing in listings])
         )
     )
+    
     return dict(status=200)
