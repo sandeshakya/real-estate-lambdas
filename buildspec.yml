@@ -5,13 +5,10 @@ phases:
     runtime-versions:
       python: 3.x
     commands:
-      - pwd
       - yum update -y
       - yum install zip -y
-      - cd point2homes-webscraper
   build:
     commands:
-      - pwd
       - echo Building Point2Homes lambda...
       - cd point2homes-webscraper/src
       - pip install -r requirements.txt -t deploy/
@@ -27,4 +24,11 @@ phases:
       - cd deploy
       - zip -r deploy.zip ./*
       - aws lambda update-function-code --function-name saskhouses-webscraper --zip-file fileb://deploy.zip
+      - echo Building Notifications lambda...
+      - cd ../../../NotificationsLambda/src
+      - pip install -r requirements.txt -t deploy/
+      - cp ./handler.py ./deploy/
+      - cd deploy
+      - zip -r deploy.zip ./*
+      - aws lambda update-function-code --function-name NotificationsLambda --zip-file fileb://deploy.zip
       
