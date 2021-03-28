@@ -1,4 +1,6 @@
 {
+  "minPrice":350000,
+  "maxPrice":450000,
   "bedsMin":3,
   "bedsMax":5
 }

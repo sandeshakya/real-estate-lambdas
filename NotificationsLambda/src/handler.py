@@ -3,9 +3,11 @@ from boto3.dynamodb.conditions import Key
 import os
 import json
 from datetime import datetime, timedelta
+import logging
 
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(os.environ.get("TABLE_NAME"))
+logging.getLogger().setLevel(logging.INFO)
 
 sns = boto3.resource('sns')
 topic = sns.Topic(os.environ.get('SNS_TOPIC'))
@@ -26,7 +28,7 @@ def handler(event, context):
         for item in resp['Items']:
             links.append(item['link'] if listing_type ==
                          'SASKHOUSES' else point2home_baseurl + item['link'])
-    print('Found {} new listings'.format(len(links)))
+    logging.info('Found {} new listings'.format(len(links)))
 
     if len(links) > 0:
         topic.publish(
@@ -37,5 +39,5 @@ def handler(event, context):
                 'email': "Found these {} new listings!\n\n{}".format(len(links), '\n'.join(links))
             })
         )
-        print('Messages sent')
+        logging.info('Messages sent')
     return {'status': 200}

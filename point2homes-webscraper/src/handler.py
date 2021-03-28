@@ -9,6 +9,8 @@ import time
 
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(os.environ.get("TABLE_NAME"))
+logging.getLogger().setLevel(logging.INFO)
+
 
 def insertToTable(item: dict) -> int:
     """
@@ -18,8 +20,8 @@ def insertToTable(item: dict) -> int:
         table.put_item(
             Item={
                 "id": item['id'],
-                "type":'POINT2HOMES',
-                'createdat':Decimal(str(round(time.time()*1000))),
+                "type": 'POINT2HOMES',
+                'createdat': Decimal(str(round(time.time()*1000))),
                 "address": item['address'],
                 "link": item['link'],
                 "beds": item['beds'],
@@ -28,7 +30,7 @@ def insertToTable(item: dict) -> int:
                 "price": item['price'],
                 "lat": Decimal(str(item['lat'])),
                 "long": Decimal(str(item['long'])),
-                
+
             },
             ConditionExpression=Attr("id").not_exists(),
         )
@@ -45,7 +47,7 @@ def handler(event, context):
 
     page = 1
     while True:
-        params = {**event,'page':page}
+        params = {**event, 'page': page}
         header = {
             "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.75 Safari/537.36",
             "X-Requested-With": "XMLHttpRequest",
@@ -64,7 +66,8 @@ def handler(event, context):
             id = link.split("/")[-1].split(".")[0]
             beds = int(item.find("li", class_="ic-beds").find("strong").text)
             baths = (
-                float(item.find("li", {"class": "ic-baths"}).find("strong").text)
+                float(
+                    item.find("li", {"class": "ic-baths"}).find("strong").text)
                 if item.find("li", {"class": "ic-baths"}) is not None
                 else None
             )
@@ -72,17 +75,20 @@ def handler(event, context):
                 item.find("li", {"class": "ic-sqft"}).find("strong").text
             )
             price = (
-                lambda x: int(x.replace("$", "").replace("CAD", "").replace(",", ""))
+                lambda x: int(x.replace("$", "").replace(
+                    "CAD", "").replace(",", ""))
             )(item.find("div", {"class": "price"}).text.strip())
             lat = float(
-                item.find("input", id=lambda x: x.startswith("Latitude")).get("value")
+                item.find("input", id=lambda x: x.startswith(
+                    "Latitude")).get("value")
             )
             long = float(
-                item.find("input", id=lambda x: x.startswith("Longitude")).get("value")
+                item.find("input", id=lambda x: x.startswith(
+                    "Longitude")).get("value")
             )
             listings.append(
                 dict(
-                    id = id,
+                    id=id,
                     address=address,
                     link=link,
                     beds=beds,
@@ -104,5 +110,5 @@ def handler(event, context):
             sum([insertToTable(listing) for listing in listings])
         )
     )
-    
+
     return dict(status=200)

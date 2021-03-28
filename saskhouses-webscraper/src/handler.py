@@ -9,7 +9,7 @@ import time
 
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(os.environ.get("TABLE_NAME"))
-
+logging.getLogger().setLevel(logging.INFO)
 
 def insertToTable(item: dict) -> int:
     """
@@ -55,7 +55,8 @@ def handler(event, context):
                 "status[]": "for-sale",
                 "bedrooms": str(bed),
                 "bathrooms": str(bath),
-                "max-price": "450000",
+                "min-price":event['minPrice'],
+                "max-price": event['maxPrice'],
             }
 
             resp = requests.get(url=search_url, params=params, headers=header)
