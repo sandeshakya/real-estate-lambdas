@@ -7,11 +7,21 @@ phases:
     commands:
       - yum update -y
       - yum install zip -y
-      - cd point2homes-webscraper/src
-      - pip install -r requirements.txt -t deploy/
   build:
     commands:
+      - echo Building Point2Homes lambda...
+      - cd point2homes-webscraper/src
+      - pip install -r requirements.txt -t deploy/
       - cp ./handler.py ./deploy/
       - cd deploy
-      - zip deploy.zip ./*
+      - zip -r deploy.zip ./*
       - aws lambda update-function-code --function-name point2homes-webscraper --zip-file fileb://deploy.zip
+      - echo Success!
+      - echo Building SaskHouses lambda...
+      - cd saskhouses-webscraper/src
+      - pip install -r requirements.txt -t deploy/
+      - cp ./handler.py ./deploy/
+      - cd deploy
+      - zip -r deploy.zip ./*
+      - aws lambda update-function-code --function-name saskhouses-webscraper --zip-file fileb://deploy.zip
+      
