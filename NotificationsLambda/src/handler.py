@@ -36,7 +36,7 @@ def handler(event, context):
             Subject='Found new Listings',
             Message=json.dumps({
                 'default': 'Found {} new listings. Check your email'.format(len(links)),
-                'email': "Found these {} new listings!\n\n{}".format(len(links), '\n'.join(links))
+                'email': "Found these {} new listings!\n\n{}".format(len(links), '\n\n'.join(links))
             })
         )
         logging.info('Messages sent')
