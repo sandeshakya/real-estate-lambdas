@@ -28,13 +28,14 @@ def handler(event, context):
                          'SASKHOUSES' else point2home_baseurl + item['link'])
     print('Found {} new listings'.format(len(links)))
 
-    topic.publish(
-        MessageStructure='json',
-        Subject='Found new Listings',
-        Message=json.dumps({
-            'default': 'Found {} new listings. Check your email'.format(len(links)),
-            'email': "Found these {} new listings!\n\n{}".format(len(links), '\n'.join(links))
-        })
-    )
-    print('Messages sent')
+    if len(links) > 0:
+        topic.publish(
+            MessageStructure='json',
+            Subject='Found new Listings',
+            Message=json.dumps({
+                'default': 'Found {} new listings. Check your email'.format(len(links)),
+                'email': "Found these {} new listings!\n\n{}".format(len(links), '\n'.join(links))
+            })
+        )
+        print('Messages sent')
     return {'status': 200}
