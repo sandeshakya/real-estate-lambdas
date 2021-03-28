@@ -1,0 +1,17 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.x
+    commands:
+      - yum update -y
+      - yum install zip -y
+      - cd point2homes-webscraper/src
+      - pip install -r requirements.txt -t deploy/
+  build:
+    commands:
+      - cp ./handler.py ./deploy/
+      - cd deploy
+      - zip deploy.zip ./*
+      - aws lambda update-function-code --function-name point2homes-webscraper --zip-file fileb://deploy.zip
