@@ -5,10 +5,13 @@ phases:
     runtime-versions:
       python: 3.x
     commands:
+      - pwd
       - yum update -y
       - yum install zip -y
+      - cd point2homes-webscraper
   build:
     commands:
+      - pwd
       - echo Building Point2Homes lambda...
       - cd point2homes-webscraper/src
       - pip install -r requirements.txt -t deploy/
