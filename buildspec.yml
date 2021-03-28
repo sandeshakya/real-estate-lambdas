@@ -18,7 +18,7 @@ phases:
       - aws lambda update-function-code --function-name point2homes-webscraper --zip-file fileb://deploy.zip
       - echo Success!
       - echo Building SaskHouses lambda...
-      - cd saskhouses-webscraper/src
+      - cd ../../../saskhouses-webscraper/src
       - pip install -r requirements.txt -t deploy/
       - cp ./handler.py ./deploy/
       - cd deploy
