@@ -45,7 +45,6 @@ def insertToTable(item):
         )
         return 1
     except Exception as e:
-        print(e)
         return 0
 
 
@@ -61,7 +60,7 @@ def handler(event, context):
         'features.PriceListMin': event['minPrice'],
         'features.PriceListMax': event['maxPrice'],
         'features.BedsMin': event['minBeds'],
-        'features.BathsMin': event['menBaths'],
+        'features.BathsMin': event['minBaths'],
         'isPhysicalLocationSearch': True,
         'includeSortFields': True
     }
@@ -74,7 +73,7 @@ def handler(event, context):
 
     resp = get(url=req)
     ids = [i.split(';')[2] for i in json.loads(resp.text)['result']['results']]
-    print(len(ids))
+
     # get listings by chunks of 20
     listing_chunks = to_matrix(ids, 20)
 
