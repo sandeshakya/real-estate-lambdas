@@ -11,7 +11,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 sns = boto3.resource('sns')
 topic = sns.Topic(os.environ.get('SNS_TOPIC'))
-listing_types = ['POINT2HOMES', 'SASKHOUSES']
+listing_types = ['POINT2HOMES', 'SASKHOUSES', 'REMAX']
 point2home_baseurl = 'https://www.point2homes.com'
 
 
