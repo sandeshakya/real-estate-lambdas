@@ -12,7 +12,6 @@ logging.getLogger().setLevel(logging.INFO)
 sns = boto3.resource('sns')
 topic = sns.Topic(os.environ.get('SNS_TOPIC'))
 listing_types = ['POINT2HOMES', 'SASKHOUSES', 'REMAX']
-point2home_baseurl = 'https://www.point2homes.com'
 
 
 def handler(event, context):
@@ -26,8 +25,7 @@ def handler(event, context):
 
         )
         for item in resp['Items']:
-            links.append(item['link'] if listing_type ==
-                         'SASKHOUSES' else point2home_baseurl + item['link'])
+            links.append(item['link'])
     logging.info('Found {} new listings'.format(len(links)))
 
     if len(links) > 0:

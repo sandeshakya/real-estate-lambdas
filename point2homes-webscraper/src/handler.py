@@ -10,7 +10,7 @@ import time
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(os.environ.get("TABLE_NAME"))
 logging.getLogger().setLevel(logging.INFO)
-
+point2home_baseurl = 'https://www.point2homes.com'
 
 def insertToTable(item: dict) -> int:
     """
@@ -23,7 +23,7 @@ def insertToTable(item: dict) -> int:
                 "type": 'POINT2HOMES',
                 'createdat': Decimal(str(round(time.time()*1000))),
                 "address": item['address'],
-                "link": item['link'],
+                "link": point2home_baseurl + item['link'],
                 "beds": item['beds'],
                 "baths": Decimal(str(item['baths'])),
                 "area": item['area'],
