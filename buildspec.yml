@@ -29,7 +29,7 @@ phases:
       - cp ./handler.py ./deploy/
       - cd deploy
       - zip -r deploy.zip ./*
-      - aws lambda update-function-code --function-name saskhouses-webscraper --zip-file fileb://deploy.zip
+      - aws lambda update-function-code --function-name remax-webscraper --zip-file fileb://deploy.zip
       - echo Building Notifications lambda...
       - cd ../../../NotificationsLambda/src
       - pip install -r requirements.txt -t deploy/
