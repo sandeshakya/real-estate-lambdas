@@ -12,7 +12,7 @@ phases:
       - echo Building Point2Homes lambda...
       - cd point2homes-webscraper/src
       - pip install -r requirements.txt -t deploy/
-      - cp ./handler.py ./deploy/
+      - cp ./index.py ./deploy/
       - cd deploy
       - zip -r deploy.zip ./*
       - aws lambda update-function-code --function-name point2homes-webscraper --zip-file fileb://deploy.zip
@@ -20,20 +20,20 @@ phases:
       - echo Building SaskHouses lambda...
       - cd ../../../saskhouses-webscraper/src
       - pip install -r requirements.txt -t deploy/
-      - cp ./handler.py ./deploy/
+      - cp ./index.py ./deploy/
       - cd deploy
       - zip -r deploy.zip ./*
       - aws lambda update-function-code --function-name saskhouses-webscraper --zip-file fileb://deploy.zip
       - cd ../../../remax-webscraper/src
       - pip install -r requirements.txt -t deploy/
-      - cp ./handler.py ./deploy/
+      - cp ./index.py ./deploy/
       - cd deploy
       - zip -r deploy.zip ./*
       - aws lambda update-function-code --function-name remax-webscraper --zip-file fileb://deploy.zip
       - echo Building Notifications lambda...
       - cd ../../../NotificationsLambda/src
       - pip install -r requirements.txt -t deploy/
-      - cp ./handler.py ./deploy/
+      - cp ./index.py ./deploy/
       - cd deploy
       - zip -r deploy.zip ./*
       - aws lambda update-function-code --function-name NotificationsLambda --zip-file fileb://deploy.zip

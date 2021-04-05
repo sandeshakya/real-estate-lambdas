@@ -1,0 +1,74 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: |
+  Nested Stack for lambda function with putItem permission to dynamodb
+Parameters:
+  LambdaName:
+    Description: Name of Lambda function
+    Type: String
+  DynamodbTableArn:
+    Description: ARN for dynamodb table the lambda function as PutItem permission for
+    Type: String
+    AllowedPattern: ^arn:aws:dynamodb:[a-zA-Z0-9-]*:[0-9]*:table\/.*$
+    ConstraintDescription: Invalid dynamodb table ARN
+  DynamodbTable:
+    Description: Table of Dynamodb table
+    Type: String
+
+Resources:
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: !Ref LambdaName
+      FunctionName: !Ref LambdaName
+      Handler: index.handler
+      MemorySize: 128
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: python3.8
+      Timeout: 180
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref DynamodbTable # A map of key-value pairs that the Lambda function can access
+      Code:
+        ZipFile: |
+          import boto3
+          import json
+          import os
+
+          def handler(event,handler):
+            print(event)
+            print(os.environ['TABLE_NAME'])
+            return dict(status=200) 
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+            - Effect: Allow
+              Action:
+              - logs:*
+              Resource: arn:aws:logs:*:*:*
+        - PolicyName: lambdaPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+            - Effect: Allow
+              Action:
+              - dynamodb:PutItem
+              Resource: !Ref DynamodbTableArn
+Outputs:
+  LambdaOutput:
+    Value: !Ref LambdaFunction
+    Description: Lambda function name
