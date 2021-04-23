@@ -74,8 +74,7 @@ def handler(event, context):
                 page = BeautifulSoup(
                     requests.get(url=link, headers=header).text, "html.parser"
                 )
-                address = page.find("li", {"class": "detail-address"}).text if page.find("li", {"class": "detail-address"}) is not None
-                    else None
+                address = page.find("li", {"class": "detail-address"}).text if page.find("li", {"class": "detail-address"}) is not None else None
                 details = page.find("div", "detail-wrap")
                 id = (
                     details.find(text="Property ID:").findNext().text.strip()
