@@ -1,0 +1,14 @@
+aws-cdk.core
+
+aws-cdk.aws_lambda
+aws-cdk.aws_lambda_python
+aws-cdk.aws_lambda_event_sources
+aws-cdk.aws_dynamodb
+aws-cdk.aws_events
+aws-cdk.aws_events_targets
+aws_cdk.aws_stepfunctions
+aws_cdk.aws_stepfunctions_tasks
+aws_cdk.aws_sns
+aws_cdk.aws_sns_subscriptions
+boto3
+botocore
